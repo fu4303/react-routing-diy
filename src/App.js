@@ -1,40 +1,19 @@
 import React from "react";
 
 function App() {
-  const [page, setPage] = React.useState(window.location.pathname);
-
-  const navigate = (event) => {
-    // stop the normal browser navigation
-    event.preventDefault();
-    window.history.pushState(null, null, event.target.pathname);
-    setPage(event.target.pathname);
-  };
-
-  React.useEffect(() => {
-    const onHistoryChange = () => {
-      setPage(window.location.pathname);
-    };
-    window.addEventListener("popstate", onHistoryChange);
-    return () => window.removeEventListener("popstate", onHistoryChange);
-  }, []);
+  const [page, setPage] = React.useState("home");
 
   return (
     <div>
       <nav>
-        <a href="/" onClick={navigate}>
-          Home
-        </a>
-        <a href="/about" onClick={navigate}>
-          About
-        </a>
-        <a href="/contact" onClick={navigate}>
-          Contact
-        </a>
+        <button onClick={() => setPage("home")}>Home</button>
+        <button onClick={() => setPage("about")}>About</button>
+        <button onClick={() => setPage("contact")}>Contact</button>
       </nav>
       <main>
-        {page === "/" && <Home />}
-        {page === "/about" && <About />}
-        {page === "/contact" && <Contact />}
+        {page === "home" && <Home />}
+        {page === "about" && <About />}
+        {page === "contact" && <Contact />}
       </main>
     </div>
   );
