@@ -166,3 +166,101 @@ Luckily there's a browser event for this: `popstate`. This event fires on the wi
 </details>
 
 Now your back and forward buttons should correctly navigate and re-render your app. That's it, you've made a whole client-side router!
+
+## Part 2: React Router
+
+We've done a lot of work to get functional client-side routing. However it's not super usable. All links need access to a function defined in `App`, which makes it awkward to use links deeper down inside other components. We also haven't even consider extra functionality that routers usually have (like Express' route params: `/blog/:id`).
+
+Luckily there's a very popular library called React Router that has done all the hard work for us. It's used by a very large percentage of React apps, since most apps need routing at some point.
+
+### React Router fundamentals
+
+React Router (RR) is based on three core components: `<BrowserRouter>`, `<Route>` and `<Link>`.
+
+
+#### `BrowserRouter`
+
+The Router is a wrapper that should live at the top of your component tree. This manages the URL state and keeps everything in sync automatically.
+
+All other routing components must be rendered _below_ a Router in the component tree, so it's usually best to put it as the first thing in your app.
+
+```js
+function App() {
+  return (
+    <BrowserRouter>
+      {/* the whole rest of your app */}
+    </BrowserRouter>
+  )
+}
+```
+
+#### `Route`
+
+Route's take a `path` prop and some children. They will render their children if the URL matches their `path` prop.
+
+```js
+function App() {
+  return (
+    <BrowserRouter>
+      <Route path="/some-path">
+        <SomeComponent />
+      </Route>
+      <Route path="/">
+        <Home />
+      </Route>
+    </BrowserRouter>
+  )
+}
+```
+
+There is one gotcha: routes always match the _beginning_ of the path, which means that `path="/"` matches _any_ URL (since all paths start with "/"). So you either have to put less specific routes last (like above), or set the `exact` prop on the Route, which tells RR to match the entire URL for that route.
+
+#### `Link`
+
+The Link component is a replacement for the HTML anchor tag. It takes a `to` prop instead of an `href`, and it will navigate to a new path, making sure the URL and history are updated.
+
+```js
+<Link to="/some-path">Go to some place</Link>
+```
+
+#### Challenge 4
+
+Rewrite your custom routing solution using React Router. You'll need to install the `react-router-dom` library as a dependency from npm, then import the three components you need from it.
+
+
+<details>
+<summary>Solution</summary>
+
+```js
+import React from "react";
+import { BrowserRouter, Route, Link } from "react-router-dom";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <nav>
+        <Link to="/">Home</Link>
+        <Link to="/about">About</Link>
+        <Link to="/contact">Contact</Link>
+      </nav>
+      <main>
+        <Route exact path="/">
+          <Home />
+        </Route>
+        <Route path="/about">
+          <About />
+        </Route>
+        <Route path="/contact">
+          <Contact />
+        </Route>
+      </main>
+    </BrowserRouter>
+  );
+}
+```
+
+**Note**: `BrowserRouter` is named because there are other kinds of router some apps might use. It's common to see `import { BrowserRouter as Router } from "react-router-dom"` to shorten the name.
+
+### More React Router
+
+React Router has lots more useful features for building app. You can learn how to use them in [the followup workshop]().
