@@ -16,7 +16,7 @@ However the concept of "pages" that are accessed at different URLs is still usef
 
 ## Part 1: DIY router
 
-### Fake routing
+### Fake routing
 
 Pretty much all apps need to render different stuff as the user interacts. The easiest way to achieve this is with buttons that update some state value to tell your app what component should be rendered.
 
@@ -32,7 +32,7 @@ Run the dev server and view the app in your browser. You may notice a couple of 
 
 We can improve this by using the URL as the "source of truth" for our page state. If we always update the URL when we set the state then they should stay in sync. This means when the user clicks "About" the URL should update to localhost:3000/about.
 
-The browser has a method for updating the URL: `window.history.pushState`. This will create a new entry in the browser history as if the user clicked a real link.
+The browser has a method for updating the URL: [`window.history.pushState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState). This will create a new entry in the browser history as if the user clicked a real link.
 
 ```js
 window.history.pushState(null, null, "/about");
@@ -40,14 +40,14 @@ window.history.pushState(null, null, "/about");
 
 It takes 3 arguments, but we don't need the first two, so they're set to `null`.
 
-To ensure refreshing the page works we should also set the initial state value to whatever the URL's pathname is. For example is the user refreshes on `/about` the initial state will be `/about`, so the `<About />` component will be shown.
+To ensure refreshing the page works we should also set the initial state value to whatever the current URL's pathname is. For example is the user refreshes on `/about` the initial state will be `/about`, so the `<About />` component will be shown.
 
 #### Challenge 1
 
 1. Change the initial state value to use `window.location.pathname`
 1. Edit the buttons' click handlers to update the browser history as well as setting state
-1. Change the conditions for each page component to match the new pathname state values
-  Hint: the homepage's pathname should be "/", not "/home"
+1. Change the conditions for each page component to match the new pathname state values.
+   - Hint: the homepage's pathname should be "/", not "/home"
 
 When you're done the app should work like before, but with the URL updating.
 
@@ -89,7 +89,7 @@ function App() {
 
 This solution can still be improved. Button's aren't really the right element for navigation: that's what the `<a>` tag is for. Using the semantically correct element is better for accessibility (and it means the default styling is closer to a normal multi-page site).
 
-If we change our buttons to links we also need to prevent their default click behaviour. Usually links send a request to the server for whatever URL is in their `href` attribute, then cause the browser to load the response as a totally new page.
+If we change our buttons to links we also need to prevent their default click behaviour. Usually links send a GET request to the server for whatever URL is in their `href` attribute, then tell the browser to load the response as a totally new page.
 
 Since we're re-implementing navigation ourselves we want to stop this using `event.preventDefault()` in the click handler.
 
@@ -140,12 +140,12 @@ function App() {
 
 You may have noticed the back/forward buttons still don't work. Although we're pushing new entries into the browser history when links are clicked, we aren't updating our page state when the history changes. This is why the app doesn't re-render when you click the back button.
 
-Luckily there's a browser event for this: `popstate`. This event fires on the window whenever the history changes, You can then update your page state to whatever the new URL is, which will re-render the app with the right UI.
+Luckily there's a browser event for this: `popstate`. This event fires on the window whenever the history changes. You can then update your page state to whatever the URL is, which will cause your app to re-render with the right UI.
 
 #### Challenge 3
 
 1. Use `React.useEffect` to add a `popstate` event listener to the `window`
-1. Inside the listener callback update the page state to the new URL pathname
+1. Inside the listener callback update the page state to the current URL pathname
 1. Make sure to clean up the effect by removing the event listener
 
 <details>
@@ -158,6 +158,7 @@ Luckily there's a browser event for this: `popstate`. This event fires on the wi
       setPage(window.location.pathname);
     };
     window.addEventListener("popstate", onHistoryChange);
+
     // return a cleanup function that removes the listener
     return () => window.removeEventListener("popstate", onHistoryChange);
   }, []);
@@ -169,13 +170,13 @@ Now your back and forward buttons should correctly navigate and re-render your a
 
 ## Part 2: React Router
 
-We've done a lot of work to get functional client-side routing. However it's not super usable. All links need access to a function defined in `App`, which makes it awkward to use links deeper down inside other components. We also haven't even consider extra functionality that routers usually have (like Express' route params: `/blog/:id`).
+We've done a lot of work to get functional client-side routing. However it's not super usable. All links need access to a function defined in `App`, which makes it awkward to use links deeper down inside other components. We also haven't even considered extra functionality that routers usually have (like Express' route params: `/blog/:id`).
 
-Luckily there's a very popular library called React Router that has done all the hard work for us. It's used by a very large percentage of React apps, since most apps need routing at some point.
+Luckily there's a very popular library called [React Router](https://reactrouter.com/web/guides/quick-start) that has done all the hard work for us. It's used by a very large percentage of React apps, since most apps need routing at some point.
 
 ### React Router fundamentals
 
-React Router (RR) is based on three core components: `<BrowserRouter>`, `<Route>` and `<Link>`.
+React Router (RR) is based on [three core components](https://reactrouter.com/web/guides/primary-components): `<BrowserRouter>`, `<Route>` and `<Link>`.
 
 
 #### `BrowserRouter`
@@ -196,7 +197,7 @@ function App() {
 
 #### `Route`
 
-Route's take a `path` prop and some children. They will render their children if the URL matches their `path` prop.
+Routes take a `path` prop and children elements. They will render their children if the URL matches their `path` prop.
 
 ```js
 function App() {
