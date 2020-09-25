@@ -1,4 +1,4 @@
-# Learn React Routing
+# DIY React Routing
 
 Learn how to implement client-side routing in React from scratch.
 
